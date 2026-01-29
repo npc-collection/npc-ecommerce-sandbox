@@ -14,8 +14,19 @@ class LLMProvider(str, Enum):
     LOCAL = "local"
 
 
+# Default models for each provider
+DEFAULT_MODELS = {
+    LLMProvider.OPENAI: "gpt-4o",
+    LLMProvider.GEMINI: "gemini-1.5-pro",
+    LLMProvider.CLAUDE: "claude-sonnet-4-20250514",
+    LLMProvider.LOCAL: "llama3.2",
+}
+
+
 class BaseLLMModel(ABC):
     """Base class for LLM model implementations."""
+
+    provider: LLMProvider
 
     def __init__(
         self,
@@ -58,16 +69,24 @@ class BaseLLMModel(ABC):
         """
         pass
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(model={self.model!r}, temperature={self.temperature})"
+
 
 class OpenAIModel(BaseLLMModel):
     """OpenAI model implementation."""
+
+    provider = LLMProvider.OPENAI
 
     def get_autogen_client(self) -> Any:
         """Get OpenAI client for AutoGen."""
         from autogen_ext.models.openai import OpenAIChatCompletionClient
 
         return OpenAIChatCompletionClient(
-            model=self.model, api_key=self.api_key, temperature=self.temperature, **self.kwargs
+            model=self.model,
+            api_key=self.api_key,
+            temperature=self.temperature,
+            **self.kwargs,
         )
 
     def get_crewai_llm(self) -> Any:
@@ -75,16 +94,20 @@ class OpenAIModel(BaseLLMModel):
         from langchain_openai import ChatOpenAI
 
         return ChatOpenAI(
-            model=self.model, api_key=self.api_key, temperature=self.temperature, **self.kwargs
+            model=self.model,
+            api_key=self.api_key,
+            temperature=self.temperature,
+            **self.kwargs,
         )
 
 
 class GeminiModel(BaseLLMModel):
     """Google Gemini model implementation."""
 
+    provider = LLMProvider.GEMINI
+
     def get_autogen_client(self) -> Any:
         """Get Gemini client for AutoGen."""
-        # AutoGen supports Gemini through OpenAI-compatible interface
         from autogen_ext.models.openai import OpenAIChatCompletionClient
 
         # Gemini can be accessed via OpenAI-compatible endpoint
@@ -111,15 +134,15 @@ class GeminiModel(BaseLLMModel):
 class ClaudeModel(BaseLLMModel):
     """Anthropic Claude model implementation."""
 
+    provider = LLMProvider.CLAUDE
+
     def get_autogen_client(self) -> Any:
         """Get Claude client for AutoGen."""
-        from autogen_ext.models.openai import OpenAIChatCompletionClient
+        from autogen_ext.models.anthropic import AnthropicChatCompletionClient
 
-        # Claude can be accessed via OpenAI-compatible endpoint
-        return OpenAIChatCompletionClient(
+        return AnthropicChatCompletionClient(
             model=self.model,
             api_key=self.api_key,
-            base_url="https://api.anthropic.com/v1",
             temperature=self.temperature,
             **self.kwargs,
         )
@@ -137,7 +160,9 @@ class ClaudeModel(BaseLLMModel):
 
 
 class LocalModel(BaseLLMModel):
-    """Local model implementation (e.g., Ollama, LM Studio)."""
+    """Local model implementation (e.g., Ollama, LM Studio, vLLM)."""
+
+    provider = LLMProvider.LOCAL
 
     def get_autogen_client(self) -> Any:
         """Get local model client for AutoGen."""
@@ -154,7 +179,7 @@ class LocalModel(BaseLLMModel):
 
     def get_crewai_llm(self) -> Any:
         """Get local model LLM for CrewAI."""
-        from langchain_community.chat_models import ChatOllama
+        from langchain_ollama import ChatOllama
 
         return ChatOllama(
             model=self.model,
@@ -167,7 +192,7 @@ class LocalModel(BaseLLMModel):
 class LLMFactory:
     """Factory for creating LLM model instances."""
 
-    _model_classes = {
+    _model_classes: dict[LLMProvider, type[BaseLLMModel]] = {
         LLMProvider.OPENAI: OpenAIModel,
         LLMProvider.GEMINI: GeminiModel,
         LLMProvider.CLAUDE: ClaudeModel,
@@ -175,10 +200,10 @@ class LLMFactory:
     }
 
     @classmethod
-    def create_model(
+    def create(
         cls,
-        provider: LLMProvider,
-        model: str,
+        provider: LLMProvider | str,
+        model: str | None = None,
         temperature: float = 0.7,
         api_key: str | None = None,
         base_url: str | None = None,
@@ -187,8 +212,8 @@ class LLMFactory:
         """Create an LLM model instance.
 
         Args:
-            provider: The LLM provider to use
-            model: The model name/identifier
+            provider: The LLM provider to use (string or enum)
+            model: The model name/identifier. If None, uses default for provider.
             temperature: Sampling temperature
             api_key: API key for the provider
             base_url: Base URL for API calls (for local models)
@@ -200,12 +225,24 @@ class LLMFactory:
         Raises:
             ValueError: If provider is not supported
         """
+        # Convert string to enum if needed
+        if isinstance(provider, str):
+            provider = LLMProvider(provider.lower())
+
         if provider not in cls._model_classes:
             raise ValueError(f"Unsupported LLM provider: {provider}")
 
+        # Use default model if not specified
+        if model is None:
+            model = DEFAULT_MODELS[provider]
+
         model_class = cls._model_classes[provider]
         return model_class(
-            model=model, temperature=temperature, api_key=api_key, base_url=base_url, **kwargs
+            model=model,
+            temperature=temperature,
+            api_key=api_key,
+            base_url=base_url,
+            **kwargs,
         )
 
     @classmethod
@@ -218,7 +255,7 @@ class LLMFactory:
         Returns:
             LLM model instance configured from settings
         """
-        provider = LLMProvider(settings.llm_provider)
+        provider = LLMProvider(settings.llm_provider.lower())
 
         # Get the appropriate API key based on provider
         api_key_map = {
@@ -230,10 +267,33 @@ class LLMFactory:
 
         api_key = api_key_map.get(provider)
 
-        return cls.create_model(
+        return cls.create(
             provider=provider,
             model=settings.llm_model,
             temperature=settings.llm_temperature,
             api_key=api_key,
             base_url=settings.llm_base_url if provider == LLMProvider.LOCAL else None,
         )
+
+    @classmethod
+    def list_providers(cls) -> list[str]:
+        """List all supported LLM providers.
+
+        Returns:
+            List of provider names
+        """
+        return [p.value for p in LLMProvider]
+
+    @classmethod
+    def get_default_model(cls, provider: LLMProvider | str) -> str:
+        """Get the default model for a provider.
+
+        Args:
+            provider: The LLM provider
+
+        Returns:
+            Default model name for the provider
+        """
+        if isinstance(provider, str):
+            provider = LLMProvider(provider.lower())
+        return DEFAULT_MODELS[provider]

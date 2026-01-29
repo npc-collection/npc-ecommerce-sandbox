@@ -11,22 +11,38 @@ authors = [
 keywords = ["crewai", "autogen", "multi-agent", "ecommerce", "simulation"]
 
 dependencies = [
+    # Agent frameworks
     "crewai>=1.9.0",
     "crewai-tools>=0.17.0",
-    "pyautogen>=0.2.0",
+    "autogen-agentchat>=0.4.0",
+    "autogen-ext[openai,anthropic]>=0.4.0",
+    # Web framework
     "fastapi>=0.109.0",
     "uvicorn[standard]>=0.27.0",
+    # Database
     "sqlalchemy>=2.0.0",
     "alembic>=1.13.0",
     "asyncpg>=0.29.0",
     "psycopg2-binary>=2.9.0",
     "redis>=5.0.0",
+    # UI
     "streamlit>=1.30.0",
+    # Core utilities
     "pydantic>=2.5.0",
     "pydantic-settings>=2.1.0",
     "python-dotenv>=1.0.0",
     "httpx>=0.26.0",
+    # LLM Providers - OpenAI
     "openai>=1.10.0",
+    "langchain-openai>=0.2.0",
+    # LLM Providers - Anthropic Claude
+    "anthropic>=0.40.0",
+    "langchain-anthropic>=0.2.0",
+    # LLM Providers - Google Gemini
+    "google-generativeai>=0.8.0",
+    "langchain-google-genai>=2.0.0",
+    # LLM Providers - Local (Ollama)
+    "langchain-ollama>=0.2.0",
 ]
 
 [project.optional-dependencies]

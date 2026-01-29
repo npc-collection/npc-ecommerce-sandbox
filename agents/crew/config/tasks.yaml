@@ -1,0 +1,67 @@
+check_inventory_levels:
+  description: >
+    Analyze current inventory levels for all products. Identify items that are:
+    1. Below reorder point and need restocking
+    2. Overstocked and may need price adjustments
+    3. Fast-moving and may need increased reorder quantities
+
+    Current inventory data: {inventory_data}
+  expected_output: >
+    A structured report containing:
+    - List of products needing reorder with recommended quantities
+    - List of overstocked products with excess quantity
+    - Recommendations for reorder point adjustments
+    - Overall inventory health score (0-100)
+  agent: inventory_agent
+
+analyze_pricing_opportunity:
+  description: >
+    Analyze pricing opportunities based on:
+    1. Current inventory levels from inventory report
+    2. Recent sales velocity
+    3. Competitor pricing (if available)
+    4. Profit margins
+
+    Inventory report: {inventory_report}
+    Sales data: {sales_data}
+  expected_output: >
+    A pricing recommendation report containing:
+    - Products recommended for price increase (with new prices)
+    - Products recommended for price decrease/promotion (with new prices)
+    - Expected impact on revenue and margins
+    - Reasoning for each recommendation
+  agent: pricing_agent
+
+process_order:
+  description: >
+    Process the incoming order:
+    1. Validate order details and customer information
+    2. Check inventory availability
+    3. Reserve inventory for the order
+    4. Calculate final pricing including any applicable discounts
+    5. Update order status
+
+    Order details: {order_data}
+  expected_output: >
+    Order processing result containing:
+    - Order confirmation number
+    - Final order total with breakdown
+    - Estimated delivery date
+    - Any issues or warnings (e.g., partial availability)
+    - Updated order status
+  agent: order_agent
+
+handle_low_stock_alert:
+  description: >
+    Handle a low stock alert for product {product_sku}:
+    1. Verify current stock levels
+    2. Check pending orders that may be affected
+    3. Determine if emergency reorder is needed
+    4. Coordinate with pricing agent if needed for demand management
+  expected_output: >
+    Action plan containing:
+    - Current stock status
+    - Affected pending orders (if any)
+    - Recommended action (reorder/price adjustment/both)
+    - Timeline for resolution
+  agent: inventory_agent
