@@ -1,6 +1,22 @@
 version: '3.8'
 
+# =============================================================================
+# Hybrid Pro Mode Setup
+# =============================================================================
+# - Docker: Infrastructure (postgres, redis) + Production deployment
+# - Local venv: Development & testing
+#
+# Usage:
+#   Development:  docker compose up -d postgres redis
+#   Production:   docker compose --profile prod up -d
+#   Admin tools:  docker compose --profile admin up -d
+# =============================================================================
+
 services:
+  # ===========================================
+  # Infrastructure Services (always available)
+  # ===========================================
+
   postgres:
     image: postgres:16-alpine
     container_name: npc-ecommerce-postgres
@@ -17,6 +33,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - npc-network
 
   redis:
     image: redis:7-alpine
@@ -31,8 +49,74 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - npc-network
 
-  # Optional: Redis Commander for debugging
+  # ===========================================
+  # Production Services (--profile prod)
+  # ===========================================
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: npc-ecommerce-api
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - DEBUG=false
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/npc_ecommerce
+      - DATABASE_SYNC_URL=postgresql://postgres:postgres@postgres:5432/npc_ecommerce
+      - REDIS_URL=redis://redis:6379/0
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
+      - LLM_MODEL=${LLM_MODEL:-gpt-4o}
+      - LLM_TEMPERATURE=${LLM_TEMPERATURE:-0.7}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - LLM_BASE_URL=${LLM_BASE_URL:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+    networks:
+      - npc-network
+    restart: unless-stopped
+    profiles:
+      - prod
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: npc-ecommerce-dashboard
+    command: ["streamlit", "run", "dashboard/app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.headless=true"]
+    ports:
+      - "8501:8501"
+    environment:
+      - API_BASE_URL=http://api:8000
+    depends_on:
+      - api
+    networks:
+      - npc-network
+    restart: unless-stopped
+    profiles:
+      - prod
+
+  # ===========================================
+  # Admin Tools (--profile admin)
+  # ===========================================
+
   redis-commander:
     image: rediscommander/redis-commander:latest
     container_name: npc-ecommerce-redis-commander
@@ -42,8 +126,11 @@ services:
       - "8081:8081"
     depends_on:
       - redis
+    networks:
+      - npc-network
+    profiles:
+      - admin
 
-  # Optional: pgAdmin for database management
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: npc-ecommerce-pgadmin
@@ -54,6 +141,14 @@ services:
       - "5050:80"
     depends_on:
       - postgres
+    networks:
+      - npc-network
+    profiles:
+      - admin
+
+networks:
+  npc-network:
+    driver: bridge
 
 volumes:
   postgres_data:
