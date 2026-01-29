@@ -5,7 +5,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Query
 from pydantic import BaseModel, Field
 
-from npc_ecommerce_sandbox.simulation import (
+from simulation import (
     SimulationEngine,
     get_simulation_engine,
     generate_random_order,

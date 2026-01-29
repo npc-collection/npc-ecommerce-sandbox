@@ -6,8 +6,8 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from npc_ecommerce_sandbox.db.models.base import Base
-from npc_ecommerce_sandbox.db.models.ecommerce import (
+from db.models.base import Base
+from db.models.ecommerce import (
     Customer,
     Inventory,
     Order,

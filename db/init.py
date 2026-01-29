@@ -8,9 +8,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from npc_ecommerce_sandbox.config import get_settings
-from npc_ecommerce_sandbox.db.models.base import Base
-from npc_ecommerce_sandbox.db.models.ecommerce import (
+from config import get_settings
+from db.models.base import Base
+from db.models.ecommerce import (
     Customer,
     Inventory,
     Order,

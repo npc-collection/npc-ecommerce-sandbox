@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from npc_ecommerce_sandbox.config import get_settings
+from config import get_settings
 from .routes import agents_router, simulation_router, ecommerce_router
 
 settings = get_settings()

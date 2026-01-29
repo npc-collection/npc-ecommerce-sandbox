@@ -4,12 +4,12 @@ import pytest
 from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from npc_ecommerce_sandbox.simulation import (
+from simulation import (
     SimulationEngine,
     get_simulation_engine,
     ScenarioType,
 )
-from npc_ecommerce_sandbox.simulation.scenarios import get_scenario
+from simulation.scenarios import get_scenario
 
 
 class TestSimulationEngine:

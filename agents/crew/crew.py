@@ -5,7 +5,7 @@ from typing import Any
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 
-from npc_ecommerce_sandbox.config import get_settings, LLMFactory
+from config import get_settings, LLMFactory
 from .tools import inventory_tools, pricing_tools, order_tools
 
 settings = get_settings()

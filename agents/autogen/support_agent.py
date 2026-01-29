@@ -7,7 +7,7 @@ from autogen_agentchat.teams import RoundRobinGroupChat, SelectorGroupChat
 from autogen_agentchat.conditions import TextMentionTermination, MaxMessageTermination
 from autogen_core.tools import FunctionTool
 
-from npc_ecommerce_sandbox.config import get_settings, LLMFactory
+from config import get_settings, LLMFactory
 
 settings = get_settings()
 

@@ -20,10 +20,10 @@ os.environ["DATABASE_SYNC_URL"] = "sqlite:///:memory:"
 os.environ["LLM_PROVIDER"] = "openai"
 os.environ["OPENAI_API_KEY"] = "test-key"
 
-from npc_ecommerce_sandbox.api import app, create_app
-from npc_ecommerce_sandbox.config import Settings, get_settings
-from npc_ecommerce_sandbox.db.models.base import Base
-from npc_ecommerce_sandbox.db.models.ecommerce import (
+from api import app, create_app
+from config import Settings, get_settings
+from db.models.base import Base
+from db.models.ecommerce import (
     Customer,
     Inventory,
     Order,

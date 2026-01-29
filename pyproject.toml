@@ -72,7 +72,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/npc_ecommerce_sandbox"]
+packages = ["api", "agents", "config", "db", "simulation", "dashboard"]
 
 [tool.black]
 line-length = 100
@@ -103,7 +103,7 @@ filterwarnings = [
 ]
 
 [tool.coverage.run]
-source = ["src/npc_ecommerce_sandbox"]
+source = ["api", "agents", "config", "db", "simulation", "dashboard"]
 branch = true
 omit = [
     "*/tests/*",

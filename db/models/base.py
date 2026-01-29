@@ -7,7 +7,7 @@ from sqlalchemy import DateTime, func
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from npc_ecommerce_sandbox.config import get_settings
+from config import get_settings
 
 settings = get_settings()
 

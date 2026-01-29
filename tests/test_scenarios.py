@@ -2,7 +2,7 @@
 
 import pytest
 
-from npc_ecommerce_sandbox.simulation.scenarios import (
+from simulation.scenarios import (
     ScenarioType,
     ScenarioConfig,
     SCENARIOS,

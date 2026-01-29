@@ -39,7 +39,7 @@ class AgentResponse(BaseModel):
 async def check_inventory(request: InventoryCheckRequest):
     """Run inventory check with CrewAI agents."""
     try:
-        from npc_ecommerce_sandbox.agents import run_inventory_check
+        from agents import run_inventory_check
 
         result = run_inventory_check(request.inventory_data)
         return AgentResponse(success=True, result=result)
@@ -51,7 +51,7 @@ async def check_inventory(request: InventoryCheckRequest):
 async def process_order(request: OrderProcessRequest):
     """Process an order with CrewAI agents."""
     try:
-        from npc_ecommerce_sandbox.agents import run_order_processing
+        from agents import run_order_processing
 
         result = run_order_processing(request.order_data)
         return AgentResponse(success=True, result=result)
@@ -63,7 +63,7 @@ async def process_order(request: OrderProcessRequest):
 async def handle_support_message(request: SupportMessageRequest):
     """Handle a customer support message with AutoGen agents."""
     try:
-        from npc_ecommerce_sandbox.agents import handle_customer_message
+        from agents import handle_customer_message
 
         result = await handle_customer_message(
             message=request.message,
@@ -78,7 +78,7 @@ async def handle_support_message(request: SupportMessageRequest):
 async def simple_support(request: SupportMessageRequest):
     """Handle a simple support query with single AutoGen agent."""
     try:
-        from npc_ecommerce_sandbox.agents import run_simple_support
+        from agents import run_simple_support
 
         result = await run_simple_support(request.message)
         return AgentResponse(success=True, result=result)

@@ -16,11 +16,11 @@ def get_project_root() -> Path:
 
 def run_api():
     """Run the FastAPI server."""
-    from npc_ecommerce_sandbox.config import get_settings
+    from config import get_settings
 
     settings = get_settings()
     uvicorn.run(
-        "npc_ecommerce_sandbox.api:app",
+        "api:app",
         host=settings.api_host,
         port=settings.api_port,
         reload=settings.debug,
@@ -29,10 +29,10 @@ def run_api():
 
 def run_dashboard():
     """Run the Streamlit dashboard."""
-    from npc_ecommerce_sandbox.config import get_settings
+    from config import get_settings
 
     settings = get_settings()
-    dashboard_path = get_project_root() / "src" / "npc_ecommerce_sandbox" / "dashboard" / "app.py"
+    dashboard_path = get_project_root() / "dashboard" / "app.py"
 
     subprocess.run([
         sys.executable, "-m", "streamlit", "run",
