@@ -11,7 +11,9 @@ class InventoryCheckTool(BaseTool):
     """Tool to check inventory levels for a product."""
 
     name: str = "check_inventory"
-    description: str = "Check current inventory level for a product by SKU. Returns quantity, reserved, and available stock."
+    description: str = (
+        "Check current inventory level for a product by SKU. Returns quantity, reserved, and available stock."
+    )
 
     def _run(self, sku: str) -> str:
         """Check inventory for a product."""
@@ -37,7 +39,9 @@ class GetProductPriceTool(BaseTool):
     """Tool to get current product pricing."""
 
     name: str = "get_product_price"
-    description: str = "Get current pricing information for a product including base price, current price, and cost."
+    description: str = (
+        "Get current pricing information for a product including base price, current price, and cost."
+    )
 
     def _run(self, sku: str) -> str:
         """Get product pricing."""
@@ -77,7 +81,9 @@ class UpdateOrderStatusTool(BaseTool):
     """Tool to update order status."""
 
     name: str = "update_order_status"
-    description: str = "Update the status of an existing order. Valid statuses: pending, confirmed, processing, shipped, delivered, cancelled"
+    description: str = (
+        "Update the status of an existing order. Valid statuses: pending, confirmed, processing, shipped, delivered, cancelled"
+    )
 
     def _run(self, order_number: str, new_status: str) -> str:
         """Update order status."""
