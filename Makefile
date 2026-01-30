@@ -46,7 +46,7 @@ test:
 	pytest tests/ -v --tb=short
 
 test-cov:
-	pytest tests/ -v --cov=api,config,db,simulation,messaging --cov-report=html
+	pytest tests/ -v --cov=api --cov=agents --cov=config --cov=db --cov=simulation --cov=messaging --cov-report=html
 
 lint:
 	ruff check .
