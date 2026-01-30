@@ -1,5 +1,6 @@
 """Streamlit dashboard for NPC E-commerce Sandbox."""
 
+from numpy.random import f
 from datetime import datetime
 
 import httpx
@@ -139,8 +140,8 @@ with tab1:
         with col3:
             st.metric(
                 "Total Revenue",
-                f"${stats.get('total_revenue', 0):,.2f}",
-                delta=f"${stats.get('revenue_today', 0):,.2f}",
+                f"${float(stats.get('total_revenue', 0)):,.2f}",
+                delta=f"${float(stats.get('revenue_today', 0)):,.2f}",
                 delta_color="normal",
             )
 
