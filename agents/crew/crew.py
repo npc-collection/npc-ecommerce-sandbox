@@ -160,7 +160,5 @@ def run_inventory_check(inventory_data: dict) -> str:
 def run_order_processing(order_data: dict) -> str:
     """Run order processing task."""
     crew = EcommerceCrew()
-    result = crew.order_processing_crew().kickoff(
-        inputs={"order_data": str(order_data)}
-    )
+    result = crew.order_processing_crew().kickoff(inputs={"order_data": str(order_data)})
     return result.raw

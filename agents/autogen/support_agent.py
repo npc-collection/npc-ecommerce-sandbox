@@ -67,6 +67,7 @@ def initiate_return(order_number: str, reason: str) -> str:
         Return confirmation details
     """
     import uuid
+
     return_id = f"RET-{uuid.uuid4().hex[:8].upper()}"
     return f"""Return initiated successfully:
 - Return ID: {return_id}
@@ -124,6 +125,7 @@ def escalate_to_human(issue_summary: str, customer_email: str) -> str:
         Escalation confirmation
     """
     import uuid
+
     ticket_id = f"TKT-{uuid.uuid4().hex[:8].upper()}"
     return f"""Issue escalated to human support:
 - Ticket ID: {ticket_id}
@@ -134,34 +136,22 @@ A support specialist will contact you shortly."""
 
 
 # Create tool instances
-order_lookup_tool = FunctionTool(
-    lookup_order,
-    description="Look up order details by order number"
-)
+order_lookup_tool = FunctionTool(lookup_order, description="Look up order details by order number")
 
 availability_tool = FunctionTool(
-    check_product_availability,
-    description="Check if a product is available in stock"
+    check_product_availability, description="Check if a product is available in stock"
 )
 
-return_tool = FunctionTool(
-    initiate_return,
-    description="Initiate a return for an order"
-)
+return_tool = FunctionTool(initiate_return, description="Initiate a return for an order")
 
 loyalty_tool = FunctionTool(
-    check_loyalty_points,
-    description="Check customer loyalty points balance"
+    check_loyalty_points, description="Check customer loyalty points balance"
 )
 
-discount_tool = FunctionTool(
-    apply_discount_code,
-    description="Validate and apply a discount code"
-)
+discount_tool = FunctionTool(apply_discount_code, description="Validate and apply a discount code")
 
 escalation_tool = FunctionTool(
-    escalate_to_human,
-    description="Escalate complex issues to human support"
+    escalate_to_human, description="Escalate complex issues to human support"
 )
 
 
@@ -198,7 +188,7 @@ Guidelines:
 - Keep responses concise but complete
 
 When a customer mentions an order number, always look it up first.
-When ending a conversation successfully, say "RESOLVED" to indicate completion."""
+When ending a conversation successfully, say "RESOLVED" to indicate completion.""",
     )
 
 
@@ -217,7 +207,7 @@ Your job is to understand the customer's request and route it appropriately:
 - Technical issues with the website or app → hand off to technical_agent
 - General product questions → answer directly or hand off to support_agent
 
-Be brief in your triage - quickly identify the issue type and hand off."""
+Be brief in your triage - quickly identify the issue type and hand off.""",
     )
 
 
@@ -239,7 +229,7 @@ You help with:
 
 Provide clear, step-by-step troubleshooting instructions.
 If you can't resolve the issue, recommend escalating to human support.
-Say "RESOLVED" when the issue is fixed."""
+Say "RESOLVED" when the issue is fixed.""",
     )
 
 
@@ -283,7 +273,7 @@ async def handle_customer_message(message: str, customer_email: Optional[str] = 
     if result.messages:
         # Get the last non-system message
         for msg in reversed(result.messages):
-            if hasattr(msg, 'content') and msg.content:
+            if hasattr(msg, "content") and msg.content:
                 return msg.content
 
     return "I apologize, but I'm having trouble processing your request. Please try again or contact support@store.com."
@@ -311,7 +301,7 @@ async def run_simple_support(message: str) -> str:
 
     if result.messages:
         for msg in reversed(result.messages):
-            if hasattr(msg, 'content') and msg.content:
+            if hasattr(msg, "content") and msg.content:
                 return msg.content
 
     return "I apologize for the inconvenience. Please contact support@store.com for assistance."

@@ -25,14 +25,14 @@ settings = get_settings()
 async def create_tables():
     """Create all database tables."""
     engine = create_async_engine(settings.database_url, echo=True)
-    
+
     async with engine.begin() as conn:
         # Drop all tables (use with caution!)
         # await conn.run_sync(Base.metadata.drop_all)
-        
+
         # Create all tables
         await conn.run_sync(Base.metadata.create_all)
-    
+
     await engine.dispose()
     print("✓ Database tables created successfully")
 
@@ -42,7 +42,7 @@ async def seed_products(session: AsyncSession) -> List[Product]:
     products_data = [
         {
             "sku": "LAPTOP-001",
-            "name": "Professional Laptop 15\"",
+            "name": 'Professional Laptop 15"',
             "description": "High-performance laptop for professionals",
             "category": "Electronics",
             "base_price": Decimal("1299.99"),
@@ -69,7 +69,7 @@ async def seed_products(session: AsyncSession) -> List[Product]:
         },
         {
             "sku": "MONITOR-001",
-            "name": "4K Monitor 27\"",
+            "name": '4K Monitor 27"',
             "description": "Ultra HD 4K monitor with HDR support",
             "category": "Electronics",
             "base_price": Decimal("499.99"),
@@ -123,7 +123,7 @@ async def seed_products(session: AsyncSession) -> List[Product]:
         },
         {
             "sku": "TABLET-001",
-            "name": "Tablet 10\"",
+            "name": 'Tablet 10"',
             "description": "Lightweight tablet with stylus support",
             "category": "Electronics",
             "base_price": Decimal("449.99"),
@@ -131,13 +131,13 @@ async def seed_products(session: AsyncSession) -> List[Product]:
             "cost": Decimal("250.00"),
         },
     ]
-    
+
     products = []
     for data in products_data:
         product = Product(**data)
         session.add(product)
         products.append(product)
-    
+
     await session.flush()
     print(f"✓ Created {len(products)} products")
     return products
@@ -147,21 +147,36 @@ async def seed_inventory(session: AsyncSession, products: List[Product]):
     """Seed initial inventory."""
     inventory_data = [
         {"product_id": products[0].id, "quantity": 50, "reorder_point": 10, "reorder_quantity": 30},
-        {"product_id": products[1].id, "quantity": 150, "reorder_point": 20, "reorder_quantity": 100},
+        {
+            "product_id": products[1].id,
+            "quantity": 150,
+            "reorder_point": 20,
+            "reorder_quantity": 100,
+        },
         {"product_id": products[2].id, "quantity": 80, "reorder_point": 15, "reorder_quantity": 50},
         {"product_id": products[3].id, "quantity": 40, "reorder_point": 8, "reorder_quantity": 25},
-        {"product_id": products[4].id, "quantity": 100, "reorder_point": 20, "reorder_quantity": 60},
+        {
+            "product_id": products[4].id,
+            "quantity": 100,
+            "reorder_point": 20,
+            "reorder_quantity": 60,
+        },
         {"product_id": products[5].id, "quantity": 25, "reorder_point": 5, "reorder_quantity": 15},
         {"product_id": products[6].id, "quantity": 35, "reorder_point": 8, "reorder_quantity": 20},
-        {"product_id": products[7].id, "quantity": 120, "reorder_point": 25, "reorder_quantity": 75},
+        {
+            "product_id": products[7].id,
+            "quantity": 120,
+            "reorder_point": 25,
+            "reorder_quantity": 75,
+        },
         {"product_id": products[8].id, "quantity": 90, "reorder_point": 18, "reorder_quantity": 55},
         {"product_id": products[9].id, "quantity": 60, "reorder_point": 12, "reorder_quantity": 40},
     ]
-    
+
     for data in inventory_data:
         inventory = Inventory(**data)
         session.add(inventory)
-    
+
     await session.flush()
     print(f"✓ Created inventory for {len(inventory_data)} products")
 
@@ -210,19 +225,21 @@ async def seed_customers(session: AsyncSession) -> List[Customer]:
             "is_vip": True,
         },
     ]
-    
+
     customers = []
     for data in customers_data:
         customer = Customer(**data)
         session.add(customer)
         customers.append(customer)
-    
+
     await session.flush()
     print(f"✓ Created {len(customers)} customers")
     return customers
 
 
-async def seed_sample_orders(session: AsyncSession, customers: List[Customer], products: List[Product]):
+async def seed_sample_orders(
+    session: AsyncSession, customers: List[Customer], products: List[Product]
+):
     """Seed sample orders."""
     # Order 1: John Doe orders laptop and mouse
     order1 = Order(
@@ -237,22 +254,26 @@ async def seed_sample_orders(session: AsyncSession, customers: List[Customer], p
     )
     session.add(order1)
     await session.flush()
-    
-    session.add(OrderItem(
-        order_id=order1.id,
-        product_id=products[0].id,
-        quantity=1,
-        unit_price=products[0].current_price,
-        total_price=products[0].current_price,
-    ))
-    session.add(OrderItem(
-        order_id=order1.id,
-        product_id=products[1].id,
-        quantity=1,
-        unit_price=products[1].current_price,
-        total_price=products[1].current_price,
-    ))
-    
+
+    session.add(
+        OrderItem(
+            order_id=order1.id,
+            product_id=products[0].id,
+            quantity=1,
+            unit_price=products[0].current_price,
+            total_price=products[0].current_price,
+        )
+    )
+    session.add(
+        OrderItem(
+            order_id=order1.id,
+            product_id=products[1].id,
+            quantity=1,
+            unit_price=products[1].current_price,
+            total_price=products[1].current_price,
+        )
+    )
+
     # Order 2: Jane Smith orders keyboard and headset
     order2 = Order(
         order_number="ORD-2024-002",
@@ -266,22 +287,26 @@ async def seed_sample_orders(session: AsyncSession, customers: List[Customer], p
     )
     session.add(order2)
     await session.flush()
-    
-    session.add(OrderItem(
-        order_id=order2.id,
-        product_id=products[2].id,
-        quantity=1,
-        unit_price=products[2].current_price,
-        total_price=products[2].current_price,
-    ))
-    session.add(OrderItem(
-        order_id=order2.id,
-        product_id=products[4].id,
-        quantity=1,
-        unit_price=products[4].current_price,
-        total_price=products[4].current_price,
-    ))
-    
+
+    session.add(
+        OrderItem(
+            order_id=order2.id,
+            product_id=products[2].id,
+            quantity=1,
+            unit_price=products[2].current_price,
+            total_price=products[2].current_price,
+        )
+    )
+    session.add(
+        OrderItem(
+            order_id=order2.id,
+            product_id=products[4].id,
+            quantity=1,
+            unit_price=products[4].current_price,
+            total_price=products[4].current_price,
+        )
+    )
+
     # Order 3: Bob Johnson orders standing desk
     order3 = Order(
         order_number="ORD-2024-003",
@@ -295,15 +320,17 @@ async def seed_sample_orders(session: AsyncSession, customers: List[Customer], p
     )
     session.add(order3)
     await session.flush()
-    
-    session.add(OrderItem(
-        order_id=order3.id,
-        product_id=products[5].id,
-        quantity=1,
-        unit_price=products[5].current_price,
-        total_price=products[5].current_price,
-    ))
-    
+
+    session.add(
+        OrderItem(
+            order_id=order3.id,
+            product_id=products[5].id,
+            quantity=1,
+            unit_price=products[5].current_price,
+            total_price=products[5].current_price,
+        )
+    )
+
     print("✓ Created 3 sample orders")
 
 
@@ -311,55 +338,55 @@ async def seed_database():
     """Seed the database with initial data."""
     engine = create_async_engine(settings.database_url, echo=False)
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    
+
     async with async_session() as session:
         async with session.begin():
             # Check if data already exists
             result = await session.execute(select(Product))
             existing_products = result.scalars().all()
-            
+
             if existing_products:
                 print("⚠ Database already contains data. Skipping seed.")
                 return
-            
+
             print("Seeding database...")
-            
+
             # Seed data
             products = await seed_products(session)
             await seed_inventory(session, products)
             customers = await seed_customers(session)
             await seed_sample_orders(session, customers, products)
-            
+
             print("✓ Database seeded successfully")
-    
+
     await engine.dispose()
 
 
 async def reset_database():
     """Reset the database (drop and recreate all tables)."""
     print("⚠ WARNING: This will delete all data!")
-    
+
     engine = create_async_engine(settings.database_url, echo=True)
-    
+
     async with engine.begin() as conn:
         # Drop all tables
         await conn.run_sync(Base.metadata.drop_all)
         print("✓ Dropped all tables")
-        
+
         # Create all tables
         await conn.run_sync(Base.metadata.create_all)
         print("✓ Created all tables")
-    
+
     await engine.dispose()
 
 
 async def main():
     """Main function."""
     import sys
-    
+
     if len(sys.argv) > 1:
         command = sys.argv[1]
-        
+
         if command == "create":
             await create_tables()
         elif command == "seed":

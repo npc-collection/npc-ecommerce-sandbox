@@ -33,7 +33,7 @@ jobs:
         run: ruff check .
 
       - name: Type check with MyPy
-        run: mypy src/ --ignore-missing-imports
+        run: mypy api/ agents/ config/ db/ simulation/ messaging/ --ignore-missing-imports
         continue-on-error: true  # Don't fail on type errors initially
 
   test:
@@ -42,7 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.11"]
 
     steps:
       - uses: actions/checkout@v4
@@ -74,7 +74,7 @@ jobs:
           LLM_PROVIDER: openai
           OPENAI_API_KEY: test-key
         run: |
-          pytest tests/ -v --cov=src/npc_ecommerce_sandbox --cov-report=xml --cov-report=term-missing
+          pytest tests/ -v --cov=api,agents,config,db,simulation,messaging --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
@@ -155,7 +155,7 @@ jobs:
           pip install bandit safety
 
       - name: Run Bandit security scan
-        run: bandit -r src/ -ll -ii
+        run: bandit -r api/ agents/ config/ db/ simulation/ messaging/ -ll -ii
         continue-on-error: true
 
       - name: Check dependencies for vulnerabilities

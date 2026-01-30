@@ -198,11 +198,7 @@ class SimulationEngine:
 
     def get_status(self) -> dict:
         """Get simulation status."""
-        elapsed = (
-            (datetime.now() - self.start_time).total_seconds() / 60
-            if self.start_time
-            else 0
-        )
+        elapsed = (datetime.now() - self.start_time).total_seconds() / 60 if self.start_time else 0
 
         return {
             "is_running": self.is_running,
@@ -282,13 +278,15 @@ class SimulationEngine:
                     item_total = price * quantity
                     subtotal += item_total
 
-                    items_data.append({
-                        "product_id": product.id,
-                        "product_name": product.name,
-                        "quantity": quantity,
-                        "unit_price": price,
-                        "total_price": item_total,
-                    })
+                    items_data.append(
+                        {
+                            "product_id": product.id,
+                            "product_name": product.name,
+                            "quantity": quantity,
+                            "unit_price": price,
+                            "total_price": item_total,
+                        }
+                    )
 
                 tax = subtotal * Decimal("0.08")
                 shipping = Decimal("15.00") if subtotal < Decimal("100.00") else Decimal("0.00")
@@ -351,9 +349,7 @@ class SimulationEngine:
                 inventory = random.choice(inventories)
 
                 # Depletion vs replenishment based on scenario
-                depletion_chance = (
-                    self.scenario.inventory_pressure if self.scenario else 0.5
-                )
+                depletion_chance = self.scenario.inventory_pressure if self.scenario else 0.5
 
                 if random.random() < depletion_chance:
                     # Deplete inventory
@@ -386,7 +382,10 @@ class SimulationEngine:
                     replenishment = inventory.reorder_quantity
 
                     # Delay replenishment during supply shortage
-                    if self.scenario and "restock_delay_multiplier" in self.scenario.special_behaviors:
+                    if (
+                        self.scenario
+                        and "restock_delay_multiplier" in self.scenario.special_behaviors
+                    ):
                         if random.random() < 0.7:  # 70% chance of delayed restock
                             return self.log_event(
                                 "restock_delayed",
@@ -521,9 +520,7 @@ async def trigger_low_stock_event(product_sku: str) -> dict:
     async with engine.async_session() as session:
         async with session.begin():
             result = await session.execute(
-                select(Inventory)
-                .join(Product)
-                .where(Product.sku == product_sku)
+                select(Inventory).join(Product).where(Product.sku == product_sku)
             )
             inventory = result.scalar_one_or_none()
 
@@ -559,9 +556,7 @@ async def trigger_price_change_event(product_sku: str, change_percent: float) ->
 
     async with engine.async_session() as session:
         async with session.begin():
-            result = await session.execute(
-                select(Product).where(Product.sku == product_sku)
-            )
+            result = await session.execute(select(Product).where(Product.sku == product_sku))
             product = result.scalar_one_or_none()
 
             if not product:

@@ -24,7 +24,9 @@ class UpdateInventoryTool(BaseTool):
     """Tool to update inventory quantities."""
 
     name: str = "update_inventory"
-    description: str = "Update inventory quantity for a product. Use for receiving stock or adjustments."
+    description: str = (
+        "Update inventory quantity for a product. Use for receiving stock or adjustments."
+    )
 
     def _run(self, sku: str, quantity_change: int, reason: str) -> str:
         """Update inventory quantity."""
@@ -39,14 +41,18 @@ class GetProductPriceTool(BaseTool):
 
     def _run(self, sku: str) -> str:
         """Get product pricing."""
-        return f"Pricing for {sku}: base_price=$99.99, current_price=$89.99, cost=$50.00, margin=44%"
+        return (
+            f"Pricing for {sku}: base_price=$99.99, current_price=$89.99, cost=$50.00, margin=44%"
+        )
 
 
 class UpdatePriceTool(BaseTool):
     """Tool to update product price."""
 
     name: str = "update_price"
-    description: str = "Update the current price for a product. Requires SKU, new price, and reason for change."
+    description: str = (
+        "Update the current price for a product. Requires SKU, new price, and reason for change."
+    )
 
     def _run(self, sku: str, new_price: float, reason: str) -> str:
         """Update product price."""
@@ -62,6 +68,7 @@ class CreateOrderTool(BaseTool):
     def _run(self, customer_id: int, items: str) -> str:
         """Create a new order."""
         import uuid
+
         order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
         return f"Created order {order_number} for customer {customer_id}. Items: {items}"
 
@@ -92,7 +99,9 @@ class GetSalesDataTool(BaseTool):
     """Tool to get sales data for analysis."""
 
     name: str = "get_sales_data"
-    description: str = "Get recent sales data for a product or all products. Useful for demand analysis."
+    description: str = (
+        "Get recent sales data for a product or all products. Useful for demand analysis."
+    )
 
     def _run(self, sku: Optional[str] = None, days: int = 7) -> str:
         """Get sales data."""

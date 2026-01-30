@@ -270,9 +270,7 @@ class EventBus:
 
             if pattern in self._handlers:
                 if handler:
-                    self._handlers[pattern] = [
-                        h for h in self._handlers[pattern] if h != handler
-                    ]
+                    self._handlers[pattern] = [h for h in self._handlers[pattern] if h != handler]
                 else:
                     del self._handlers[pattern]
 
@@ -399,6 +397,7 @@ def subscribe(event_type: EventType | str):
         async def handle_order_created(event: Event):
             print(f"Order created: {event.data}")
     """
+
     def decorator(func: EventHandler) -> EventHandler:
         async def register():
             bus = get_event_bus()

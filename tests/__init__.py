@@ -12,7 +12,7 @@ Run tests with:
     pytest tests/ -v
 
 Run with coverage:
-    pytest tests/ -v --cov=src/npc_ecommerce_sandbox --cov-report=html
+    pytest tests/ -v --cov=api,agents,config,db,simulation,messaging --cov-report=html
 
 Run specific test file:
     pytest tests/test_api.py -v

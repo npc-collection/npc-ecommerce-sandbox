@@ -100,7 +100,9 @@ class TestEvent:
 
     def test_event_from_json(self):
         """Test creating event from JSON."""
-        json_str = '{"id": "test-id", "type": "inventory.low", "data": {"qty": 5}, "source": "test"}'
+        json_str = (
+            '{"id": "test-id", "type": "inventory.low", "data": {"qty": 5}, "source": "test"}'
+        )
 
         event = Event.from_json(json_str)
 

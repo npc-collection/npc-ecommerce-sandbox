@@ -149,7 +149,9 @@ class TestLLMFactory:
 
     def test_create_invalid_provider(self):
         """Test creating model with invalid provider."""
-        with pytest.raises(ValueError, match="(Unsupported LLM provider|is not a valid LLMProvider)"):
+        with pytest.raises(
+            ValueError, match="(Unsupported LLM provider|is not a valid LLMProvider)"
+        ):
             LLMFactory.create(provider="invalid", api_key="test-key")
 
     def test_list_providers(self):

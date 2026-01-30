@@ -181,7 +181,9 @@ class TestScenarioValidation:
             assert config.order_rate_multiplier > 0, f"{scenario_type} has invalid order rate"
             assert 0 <= config.price_volatility <= 1, f"{scenario_type} has invalid volatility"
             assert 0 <= config.inventory_pressure <= 1, f"{scenario_type} has invalid pressure"
-            assert 0 <= config.customer_support_load <= 1, f"{scenario_type} has invalid support load"
+            assert (
+                0 <= config.customer_support_load <= 1
+            ), f"{scenario_type} has invalid support load"
 
     def test_all_scenarios_have_positive_duration(self):
         """Test all scenarios have positive duration."""

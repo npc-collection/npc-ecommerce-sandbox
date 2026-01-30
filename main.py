@@ -34,12 +34,19 @@ def run_dashboard():
     settings = get_settings()
     dashboard_path = get_project_root() / "dashboard" / "app.py"
 
-    subprocess.run([
-        sys.executable, "-m", "streamlit", "run",
-        str(dashboard_path),
-        "--server.port", str(settings.streamlit_port),
-        "--server.headless", "true",
-    ])
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "streamlit",
+            "run",
+            str(dashboard_path),
+            "--server.port",
+            str(settings.streamlit_port),
+            "--server.headless",
+            "true",
+        ]
+    )
 
 
 def main():
