@@ -1,18 +1,18 @@
 """Tests for configuration module."""
 
 import os
-import pytest
 from unittest.mock import patch
 
+import pytest
+
 from config import (
-    Settings,
-    get_settings,
-    LLMProvider,
-    LLMFactory,
-    OpenAIModel,
-    GeminiModel,
     ClaudeModel,
+    GeminiModel,
+    LLMFactory,
+    LLMProvider,
     LocalModel,
+    OpenAIModel,
+    Settings,
 )
 
 

@@ -1,8 +1,8 @@
 """Messaging module for event-driven communication."""
 
 from .event_bus import (
-    EventBus,
     Event,
+    EventBus,
     EventType,
     get_event_bus,
     publish_event,

@@ -5,8 +5,9 @@ from typing import Any
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 
-from config import get_settings, LLMFactory
-from .tools import inventory_tools, pricing_tools, order_tools
+from config import LLMFactory, get_settings
+
+from .tools import inventory_tools, order_tools, pricing_tools
 
 settings = get_settings()
 

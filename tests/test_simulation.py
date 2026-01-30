@@ -1,15 +1,15 @@
 """Tests for simulation engine."""
 
-import pytest
 from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+
 from simulation import (
+    ScenarioType,
     SimulationEngine,
     get_simulation_engine,
-    ScenarioType,
 )
-from simulation.scenarios import get_scenario
 
 
 class TestSimulationEngine:

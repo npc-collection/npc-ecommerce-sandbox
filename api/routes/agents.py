@@ -1,8 +1,6 @@
 """API routes for agent interactions."""
 
-from typing import Optional
-
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="/agents", tags=["agents"])
@@ -24,7 +22,7 @@ class SupportMessageRequest(BaseModel):
     """Request model for customer support."""
 
     message: str
-    customer_email: Optional[str] = None
+    customer_email: str | None = None
 
 
 class AgentResponse(BaseModel):
@@ -32,7 +30,7 @@ class AgentResponse(BaseModel):
 
     success: bool
     result: str
-    task_id: Optional[str] = None
+    task_id: str | None = None
 
 
 @router.post("/inventory/check", response_model=AgentResponse)

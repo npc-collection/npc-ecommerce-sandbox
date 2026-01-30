@@ -1,8 +1,6 @@
 """Streamlit dashboard for NPC E-commerce Sandbox."""
 
-import asyncio
 from datetime import datetime
-from typing import Dict, List
 
 import httpx
 import pandas as pd
@@ -20,7 +18,7 @@ st.set_page_config(
 API_BASE_URL = "http://localhost:8000"
 
 
-def get_api_data(endpoint: str) -> Dict:
+def get_api_data(endpoint: str) -> dict:
     """Fetch data from API."""
     try:
         response = httpx.get(f"{API_BASE_URL}{endpoint}", timeout=10.0)
@@ -31,7 +29,7 @@ def get_api_data(endpoint: str) -> Dict:
         return {}
 
 
-def post_api_data(endpoint: str, data: Dict) -> Dict:
+def post_api_data(endpoint: str, data: dict) -> dict:
     """Post data to API."""
     try:
         response = httpx.post(f"{API_BASE_URL}{endpoint}", json=data, timeout=10.0)

@@ -2,10 +2,11 @@
 
 import asyncio
 import json
-from dataclasses import dataclass, field, asdict
+from collections.abc import Callable, Coroutine
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Coroutine, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 import redis.asyncio as redis
@@ -54,13 +55,13 @@ class Event:
     """Event data structure."""
 
     type: EventType
-    data: Dict[str, Any]
+    data: dict[str, Any]
     id: str = field(default_factory=lambda: str(uuid4()))
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
     source: str = "system"
-    correlation_id: Optional[str] = None
+    correlation_id: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert event to dictionary."""
         return {
             "id": self.id,
@@ -76,7 +77,7 @@ class Event:
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Event":
+    def from_dict(cls, data: dict[str, Any]) -> "Event":
         """Create event from dictionary."""
         event_type = data.get("type", "")
         try:
@@ -106,7 +107,7 @@ EventHandler = Callable[[Event], Coroutine[Any, Any, None]]
 class EventBus:
     """Redis-based event bus for async agent communication."""
 
-    def __init__(self, redis_url: Optional[str] = None):
+    def __init__(self, redis_url: str | None = None):
         """Initialize the event bus.
 
         Args:
@@ -114,12 +115,12 @@ class EventBus:
         """
         settings = get_settings()
         self.redis_url = redis_url or settings.redis_url
-        self._redis: Optional[redis.Redis] = None
-        self._pubsub: Optional[redis.client.PubSub] = None
-        self._handlers: Dict[str, List[EventHandler]] = {}
+        self._redis: redis.Redis | None = None
+        self._pubsub: redis.client.PubSub | None = None
+        self._handlers: dict[str, list[EventHandler]] = {}
         self._running = False
-        self._listener_task: Optional[asyncio.Task] = None
-        self._local_handlers: Dict[str, List[EventHandler]] = {}
+        self._listener_task: asyncio.Task | None = None
+        self._local_handlers: dict[str, list[EventHandler]] = {}
         self._use_redis = True
 
     async def connect(self) -> None:
@@ -238,7 +239,7 @@ class EventBus:
     async def unsubscribe(
         self,
         event_type: EventType | str,
-        handler: Optional[EventHandler] = None,
+        handler: EventHandler | None = None,
     ) -> None:
         """Unsubscribe from an event type.
 
@@ -302,7 +303,7 @@ class EventBus:
                 print(f"[EventBus] Listener error: {e}")
                 await asyncio.sleep(1)
 
-    async def _handle_message(self, message: Dict[str, Any]) -> None:
+    async def _handle_message(self, message: dict[str, Any]) -> None:
         """Handle a received message."""
         try:
             data = message.get("data")
@@ -348,7 +349,7 @@ class EventBus:
 
 
 # Global event bus instance
-_event_bus: Optional[EventBus] = None
+_event_bus: EventBus | None = None
 
 
 def get_event_bus() -> EventBus:
@@ -361,9 +362,9 @@ def get_event_bus() -> EventBus:
 
 async def publish_event(
     event_type: EventType,
-    data: Dict[str, Any],
+    data: dict[str, Any],
     source: str = "system",
-    correlation_id: Optional[str] = None,
+    correlation_id: str | None = None,
 ) -> Event:
     """Convenience function to publish an event.
 

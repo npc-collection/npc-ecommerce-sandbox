@@ -1,18 +1,16 @@
 """API routes for simulation control."""
 
-from typing import Optional
-
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Query
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from simulation import (
+    ScenarioType,
     SimulationEngine,
-    get_simulation_engine,
     generate_random_order,
+    get_simulation_engine,
+    list_scenarios,
     trigger_low_stock_event,
     trigger_price_change_event,
-    ScenarioType,
-    list_scenarios,
 )
 
 router = APIRouter(prefix="/simulation", tags=["simulation"])
@@ -30,14 +28,14 @@ class SimulationConfig(BaseModel):
     order_rate_per_minute: float = Field(default=2.0, ge=0.1, le=100)
     include_price_changes: bool = True
     include_inventory_events: bool = True
-    random_seed: Optional[int] = None
+    random_seed: int | None = None
 
 
 class SimulationStatus(BaseModel):
     """Status of a simulation run."""
 
     running: bool
-    scenario: Optional[str] = None
+    scenario: str | None = None
     elapsed_minutes: float
     total_orders: int
     total_revenue: float

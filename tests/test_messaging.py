@@ -1,9 +1,8 @@
 """Tests for messaging/event bus module."""
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
-from messaging import Event, EventType, EventBus, get_event_bus, publish_event
+from messaging import Event, EventBus, EventType, get_event_bus, publish_event
 
 
 class TestEventType:

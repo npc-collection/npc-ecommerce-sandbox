@@ -1,15 +1,15 @@
 """Agents module combining CrewAI and AutoGen agents."""
 
-from .crew import (
-    EcommerceCrew,
-    run_inventory_check,
-    run_order_processing,
-)
 from .autogen import (
     create_support_agent,
     create_support_team,
     handle_customer_message,
     run_simple_support,
+)
+from .crew import (
+    EcommerceCrew,
+    run_inventory_check,
+    run_order_processing,
 )
 
 __all__ = [

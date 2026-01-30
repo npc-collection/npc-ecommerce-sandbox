@@ -1,11 +1,9 @@
 """API routes for e-commerce data."""
 
-from typing import List, Optional
 from decimal import Decimal
 
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel, Field
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/ecommerce", tags=["ecommerce"])
 
@@ -16,7 +14,7 @@ class ProductBase(BaseModel):
 
     sku: str
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     category: str
     base_price: Decimal
     current_price: Decimal
@@ -49,7 +47,7 @@ class InventoryResponse(BaseModel):
     available_quantity: int
     reorder_point: int
     reorder_quantity: int
-    warehouse_location: Optional[str] = None
+    warehouse_location: str | None = None
 
     class Config:
         from_attributes = True
@@ -120,9 +118,9 @@ MOCK_PRODUCTS = [
 ]
 
 
-@router.get("/products", response_model=List[ProductResponse])
+@router.get("/products", response_model=list[ProductResponse])
 async def list_products(
-    category: Optional[str] = None,
+    category: str | None = None,
     skip: int = 0,
     limit: int = 100,
 ):
@@ -142,7 +140,7 @@ async def get_product(sku: str):
     raise HTTPException(status_code=404, detail="Product not found")
 
 
-@router.get("/inventory", response_model=List[InventoryResponse])
+@router.get("/inventory", response_model=list[InventoryResponse])
 async def list_inventory(low_stock_only: bool = False):
     """List inventory for all products."""
     mock_inventory = [
@@ -186,9 +184,9 @@ async def list_inventory(low_stock_only: bool = False):
     return mock_inventory
 
 
-@router.get("/orders", response_model=List[OrderResponse])
+@router.get("/orders", response_model=list[OrderResponse])
 async def list_orders(
-    status: Optional[str] = None,
+    status: str | None = None,
     skip: int = 0,
     limit: int = 100,
 ):

@@ -6,7 +6,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import get_settings
-from .routes import agents_router, simulation_router, ecommerce_router
+
+from .routes import agents_router, ecommerce_router, simulation_router
 
 settings = get_settings()
 

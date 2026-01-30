@@ -50,7 +50,7 @@ test-cov:
 
 lint:
 	ruff check .
-	mypy . --ignore-missing-imports
+	mypy api/ agents/ config/ db/ simulation/ messaging/ --ignore-missing-imports
 
 format:
 	black .

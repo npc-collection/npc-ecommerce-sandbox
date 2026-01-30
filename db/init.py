@@ -2,7 +2,6 @@
 
 import asyncio
 from decimal import Decimal
-from typing import List
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -37,7 +36,7 @@ async def create_tables():
     print("✓ Database tables created successfully")
 
 
-async def seed_products(session: AsyncSession) -> List[Product]:
+async def seed_products(session: AsyncSession) -> list[Product]:
     """Seed initial products."""
     products_data = [
         {
@@ -143,7 +142,7 @@ async def seed_products(session: AsyncSession) -> List[Product]:
     return products
 
 
-async def seed_inventory(session: AsyncSession, products: List[Product]):
+async def seed_inventory(session: AsyncSession, products: list[Product]):
     """Seed initial inventory."""
     inventory_data = [
         {"product_id": products[0].id, "quantity": 50, "reorder_point": 10, "reorder_quantity": 30},
@@ -181,7 +180,7 @@ async def seed_inventory(session: AsyncSession, products: List[Product]):
     print(f"✓ Created inventory for {len(inventory_data)} products")
 
 
-async def seed_customers(session: AsyncSession) -> List[Customer]:
+async def seed_customers(session: AsyncSession) -> list[Customer]:
     """Seed initial customers."""
     customers_data = [
         {
@@ -238,7 +237,7 @@ async def seed_customers(session: AsyncSession) -> List[Customer]:
 
 
 async def seed_sample_orders(
-    session: AsyncSession, customers: List[Customer], products: List[Product]
+    session: AsyncSession, customers: list[Customer], products: list[Product]
 ):
     """Seed sample orders."""
     # Order 1: John Doe orders laptop and mouse

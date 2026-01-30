@@ -2,9 +2,9 @@
 
 import asyncio
 import os
+from collections.abc import AsyncGenerator, Generator
 from decimal import Decimal
-from typing import AsyncGenerator, Generator
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from fastapi.testclient import TestClient
@@ -26,10 +26,6 @@ from db.models.base import Base
 from db.models.ecommerce import (
     Customer,
     Inventory,
-    Order,
-    OrderItem,
-    OrderStatus,
-    PriceHistory,
     Product,
 )
 

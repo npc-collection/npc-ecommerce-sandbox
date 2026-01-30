@@ -1,13 +1,13 @@
 """AutoGen-based customer support agent for natural language interactions."""
 
-from typing import Any, Optional
+from typing import Any
 
 from autogen_agentchat.agents import AssistantAgent
+from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination
 from autogen_agentchat.teams import RoundRobinGroupChat, SelectorGroupChat
-from autogen_agentchat.conditions import TextMentionTermination, MaxMessageTermination
 from autogen_core.tools import FunctionTool
 
-from config import get_settings, LLMFactory
+from config import LLMFactory, get_settings
 
 settings = get_settings()
 
@@ -252,7 +252,7 @@ async def create_support_team() -> SelectorGroupChat:
     return team
 
 
-async def handle_customer_message(message: str, customer_email: Optional[str] = None) -> str:
+async def handle_customer_message(message: str, customer_email: str | None = None) -> str:
     """Handle a customer support message.
 
     Args:

@@ -2,9 +2,9 @@
 
 import asyncio
 import random
+from collections.abc import AsyncGenerator
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Any, AsyncGenerator, Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -20,7 +20,8 @@ from db.models.ecommerce import (
     PriceHistory,
     Product,
 )
-from .scenarios import ScenarioConfig, ScenarioType, get_scenario, SCENARIOS
+
+from .scenarios import ScenarioConfig, ScenarioType, get_scenario
 
 settings = get_settings()
 
@@ -33,7 +34,7 @@ class SimulationEngine:
         order_rate: float = 2.0,
         include_price_changes: bool = True,
         include_inventory_events: bool = True,
-        random_seed: Optional[int] = None,
+        random_seed: int | None = None,
     ):
         """Initialize the simulation engine.
 
@@ -51,8 +52,8 @@ class SimulationEngine:
             random.seed(random_seed)
 
         self.is_running = False
-        self.scenario: Optional[ScenarioConfig] = None
-        self.start_time: Optional[datetime] = None
+        self.scenario: ScenarioConfig | None = None
+        self.start_time: datetime | None = None
         self.orders_generated = 0
         self.total_revenue = Decimal("0.00")
         self.inventory_alerts = 0
@@ -81,7 +82,7 @@ class SimulationEngine:
     async def run(
         self,
         duration_minutes: int = 60,
-        scenario: Optional[ScenarioType | str] = None,
+        scenario: ScenarioType | str | None = None,
     ) -> AsyncGenerator[dict, None]:
         """Run the simulation and yield events.
 
@@ -224,7 +225,7 @@ class SimulationEngine:
         print(f"[SIMULATION] {event_type}: {data}")
         return event
 
-    async def _generate_order(self) -> Optional[dict]:
+    async def _generate_order(self) -> dict | None:
         """Generate a random order based on scenario."""
         async with self.async_session() as session:
             async with session.begin():
@@ -337,7 +338,7 @@ class SimulationEngine:
                     },
                 )
 
-    async def _trigger_inventory_event(self) -> Optional[dict]:
+    async def _trigger_inventory_event(self) -> dict | None:
         """Trigger an inventory event based on scenario."""
         async with self.async_session() as session:
             async with session.begin():
@@ -408,7 +409,7 @@ class SimulationEngine:
                         },
                     )
 
-    async def _trigger_price_change(self) -> Optional[dict]:
+    async def _trigger_price_change(self) -> dict | None:
         """Trigger a price change based on scenario."""
         async with self.async_session() as session:
             async with session.begin():
@@ -479,7 +480,7 @@ class SimulationEngine:
 
 
 # Global simulation instance
-_simulation_engine: Optional[SimulationEngine] = None
+_simulation_engine: SimulationEngine | None = None
 
 
 def get_simulation_engine() -> SimulationEngine:
