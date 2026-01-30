@@ -70,8 +70,8 @@ def sync_engine():
 @pytest.fixture
 def sync_session(sync_engine):
     """Create sync database session."""
-    Session = sessionmaker(bind=sync_engine)
-    session = Session()
+    session_factory = sessionmaker(bind=sync_engine)
+    session = session_factory()
     yield session
     session.close()
 

@@ -8,7 +8,8 @@ class InventoryCheckTool(BaseTool):
 
     name: str = "check_inventory"
     description: str = (
-        "Check current inventory level for a product by SKU. Returns quantity, reserved, and available stock."
+        "Check current inventory level for a product by SKU. "
+        "Returns quantity, reserved, and available stock."
     )
 
     def _run(self, sku: str) -> str:
@@ -36,7 +37,8 @@ class GetProductPriceTool(BaseTool):
 
     name: str = "get_product_price"
     description: str = (
-        "Get current pricing information for a product including base price, current price, and cost."
+        "Get current pricing information for a product "
+        "including base price, current price, and cost."
     )
 
     def _run(self, sku: str) -> str:
@@ -78,7 +80,8 @@ class UpdateOrderStatusTool(BaseTool):
 
     name: str = "update_order_status"
     description: str = (
-        "Update the status of an existing order. Valid statuses: pending, confirmed, processing, shipped, delivered, cancelled"
+        "Update the status of an existing order. "
+        "Valid statuses: pending, confirmed, processing, shipped, delivered, cancelled"
     )
 
     def _run(self, order_number: str, new_status: str) -> str:
@@ -108,7 +111,10 @@ class GetSalesDataTool(BaseTool):
     def _run(self, sku: str | None = None, days: int = 7) -> str:
         """Get sales data."""
         if sku:
-            return f"Sales data for {sku} (last {days} days): units_sold=45, revenue=$4,049.55, avg_daily=6.4"
+            return (
+                f"Sales data for {sku} (last {days} days): "
+                "units_sold=45, revenue=$4,049.55, avg_daily=6.4"
+            )
         return f"Total sales (last {days} days): orders=150, revenue=$15,000, avg_order_value=$100"
 
 

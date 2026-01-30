@@ -238,7 +238,7 @@ class SimulationEngine:
                 customer = random.choice(customers)
 
                 # Get products based on scenario
-                query = select(Product).where(Product.is_active == True)
+                query = select(Product).where(Product.is_active)
                 result = await session.execute(query)
                 products = result.scalars().all()
                 if not products:
@@ -413,7 +413,7 @@ class SimulationEngine:
         """Trigger a price change based on scenario."""
         async with self.async_session() as session:
             async with session.begin():
-                result = await session.execute(select(Product).where(Product.is_active == True))
+                result = await session.execute(select(Product).where(Product.is_active))
                 products = result.scalars().all()
                 if not products:
                     return None
@@ -459,7 +459,10 @@ class SimulationEngine:
                     product_id=product.id,
                     old_price=old_price,
                     new_price=new_price,
-                    reason=f"Simulation: {self.scenario.name if self.scenario else 'dynamic_adjustment'}",
+                    reason=(
+                        "Simulation: "
+                        f"{self.scenario.name if self.scenario else 'dynamic_adjustment'}"
+                    ),
                     changed_by="simulation_engine",
                 )
                 session.add(history)

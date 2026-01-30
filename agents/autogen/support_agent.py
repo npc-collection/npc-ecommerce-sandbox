@@ -170,7 +170,8 @@ def create_support_agent() -> AssistantAgent:
             discount_tool,
             escalation_tool,
         ],
-        system_message="""You are a friendly and helpful customer support agent for an e-commerce store.
+        system_message="""\
+You are a friendly and helpful customer support agent for an e-commerce store.
 
 Your responsibilities:
 1. Help customers with order inquiries (tracking, status, issues)
@@ -276,7 +277,10 @@ async def handle_customer_message(message: str, customer_email: str | None = Non
             if hasattr(msg, "content") and msg.content:
                 return msg.content
 
-    return "I apologize, but I'm having trouble processing your request. Please try again or contact support@store.com."
+    return (
+        "I apologize, but I'm having trouble processing your request. "
+        "Please try again or contact support@store.com."
+    )
 
 
 async def run_simple_support(message: str) -> str:

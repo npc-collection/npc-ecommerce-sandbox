@@ -311,7 +311,7 @@ class EventBus:
                 return
 
             event = Event.from_json(data)
-            channel = message.get("channel", "")
+            message.get("channel", "")
             pattern = message.get("pattern")
 
             # Determine which handlers to call

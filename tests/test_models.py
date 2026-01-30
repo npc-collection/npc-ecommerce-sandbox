@@ -23,8 +23,8 @@ def db_session():
     """Create in-memory database session."""
     engine = create_engine("sqlite:///:memory:")
     Base.metadata.create_all(bind=engine)
-    Session = sessionmaker(bind=engine)
-    session = Session()
+    session_maker = sessionmaker(bind=engine)
+    session = session_maker()
     yield session
     session.close()
 

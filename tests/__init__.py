@@ -12,7 +12,8 @@ Run tests with:
     pytest tests/ -v
 
 Run with coverage:
-    pytest tests/ -v --cov=api --cov=agents --cov=config --cov=db --cov=simulation --cov=messaging --cov-report=html
+    pytest tests/ -v --cov=api --cov=agents --cov=config \
+        --cov=db --cov=simulation --cov=messaging --cov-report=html
 
 Run specific test file:
     pytest tests/test_api.py -v
