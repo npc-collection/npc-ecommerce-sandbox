@@ -3,7 +3,7 @@
 from decimal import Decimal
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 router = APIRouter(prefix="/ecommerce", tags=["ecommerce"])
 
@@ -30,15 +30,16 @@ class ProductCreate(ProductBase):
 class ProductResponse(ProductBase):
     """Response model for product."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     is_active: bool
-
-    class Config:
-        from_attributes = True
 
 
 class InventoryResponse(BaseModel):
     """Response model for inventory."""
+
+    model_config = ConfigDict(from_attributes=True)
 
     id: int
     product_id: int
@@ -49,12 +50,11 @@ class InventoryResponse(BaseModel):
     reorder_quantity: int
     warehouse_location: str | None = None
 
-    class Config:
-        from_attributes = True
-
 
 class OrderResponse(BaseModel):
     """Response model for order."""
+
+    model_config = ConfigDict(from_attributes=True)
 
     id: int
     order_number: str
@@ -64,9 +64,6 @@ class OrderResponse(BaseModel):
     tax: Decimal
     shipping: Decimal
     total: Decimal
-
-    class Config:
-        from_attributes = True
 
 
 class DashboardStats(BaseModel):

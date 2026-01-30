@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import logging
 from collections.abc import Callable, Coroutine
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -12,6 +13,8 @@ from uuid import uuid4
 import redis.asyncio as redis
 
 from config import get_settings
+
+logger = logging.getLogger(__name__)
 
 
 class EventType(str, Enum):
@@ -129,9 +132,9 @@ class EventBus:
             self._redis = redis.from_url(self.redis_url, decode_responses=True)
             await self._redis.ping()
             self._pubsub = self._redis.pubsub()
-            print(f"[EventBus] Connected to Redis: {self.redis_url}")
+            logger.info("Connected to Redis: %s", self.redis_url)
         except Exception as e:
-            print(f"[EventBus] Redis connection failed: {e}. Using local mode.")
+            logger.warning("Redis connection failed: %s. Using local mode.", e)
             self._use_redis = False
             self._redis = None
             self._pubsub = None
@@ -153,7 +156,7 @@ class EventBus:
         if self._redis:
             await self._redis.close()
 
-        print("[EventBus] Disconnected")
+        logger.info("Disconnected")
 
     async def publish(self, event: Event) -> None:
         """Publish an event.
@@ -166,7 +169,7 @@ class EventBus:
 
         if self._use_redis and self._redis:
             await self._redis.publish(channel, message)
-            print(f"[EventBus] Published {event.type} to {channel}")
+            logger.debug("Published %s to %s", event.type, channel)
         else:
             # Local mode: directly call handlers
             await self._dispatch_local(event)
@@ -181,7 +184,7 @@ class EventBus:
                 try:
                     await handler(event)
                 except Exception as e:
-                    print(f"[EventBus] Handler error: {e}")
+                    logger.error("Handler error: %s", e)
 
         # Check wildcard handlers (e.g., "order.*")
         prefix = event_type.split(".")[0] + ".*"
@@ -190,7 +193,7 @@ class EventBus:
                 try:
                     await handler(event)
                 except Exception as e:
-                    print(f"[EventBus] Handler error: {e}")
+                    logger.error("Handler error: %s", e)
 
         # Check global handlers
         if "*" in self._local_handlers:
@@ -198,7 +201,7 @@ class EventBus:
                 try:
                     await handler(event)
                 except Exception as e:
-                    print(f"[EventBus] Handler error: {e}")
+                    logger.error("Handler error: %s", e)
 
     async def subscribe(
         self,
@@ -234,7 +237,7 @@ class EventBus:
                 self._handlers[pattern] = []
             self._handlers[pattern].append(handler)
 
-            print(f"[EventBus] Subscribed to {pattern}")
+            logger.info("Subscribed to %s", pattern)
 
     async def unsubscribe(
         self,
@@ -278,12 +281,12 @@ class EventBus:
     async def start_listening(self) -> None:
         """Start the event listener loop."""
         if not self._use_redis or not self._pubsub:
-            print("[EventBus] Running in local mode (no Redis)")
+            logger.info("Running in local mode (no Redis)")
             return
 
         self._running = True
         self._listener_task = asyncio.create_task(self._listen())
-        print("[EventBus] Started listening for events")
+        logger.info("Started listening for events")
 
     async def _listen(self) -> None:
         """Listen for events from Redis."""
@@ -300,7 +303,7 @@ class EventBus:
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                print(f"[EventBus] Listener error: {e}")
+                logger.error("Listener error: %s", e)
                 await asyncio.sleep(1)
 
     async def _handle_message(self, message: dict[str, Any]) -> None:
@@ -311,7 +314,6 @@ class EventBus:
                 return
 
             event = Event.from_json(data)
-            message.get("channel", "")
             pattern = message.get("pattern")
 
             # Determine which handlers to call
@@ -334,12 +336,12 @@ class EventBus:
                 try:
                     await handler(event)
                 except Exception as e:
-                    print(f"[EventBus] Handler error for {event_type}: {e}")
+                    logger.error("Handler error for %s: %s", event_type, e)
 
         except json.JSONDecodeError as e:
-            print(f"[EventBus] Invalid JSON in message: {e}")
+            logger.error("Invalid JSON in message: %s", e)
         except Exception as e:
-            print(f"[EventBus] Error handling message: {e}")
+            logger.error("Error handling message: %s", e)
 
     def _get_channel(self, event_type: EventType | str) -> str:
         """Get Redis channel name for event type."""

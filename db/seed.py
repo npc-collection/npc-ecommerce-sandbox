@@ -33,7 +33,7 @@ async def create_tables():
         await conn.run_sync(Base.metadata.create_all)
 
     await engine.dispose()
-    print("✓ Database tables created successfully")
+    print("[OK] Database tables created successfully")
 
 
 async def seed_products(session: AsyncSession) -> list[Product]:
@@ -330,7 +330,7 @@ async def seed_sample_orders(
         )
     )
 
-    print("✓ Created 3 sample orders")
+    print("[OK] Created 3 sample orders")
 
 
 async def seed_database():
@@ -345,7 +345,7 @@ async def seed_database():
             existing_products = result.scalars().all()
 
             if existing_products:
-                print("⚠ Database already contains data. Skipping seed.")
+                print("[WARN] Database already contains data. Skipping seed.")
                 return
 
             print("Seeding database...")
@@ -356,25 +356,25 @@ async def seed_database():
             customers = await seed_customers(session)
             await seed_sample_orders(session, customers, products)
 
-            print("✓ Database seeded successfully")
+            print("[OK] Database seeded successfully")
 
     await engine.dispose()
 
 
 async def reset_database():
     """Reset the database (drop and recreate all tables)."""
-    print("⚠ WARNING: This will delete all data!")
+    print("[WARN] WARNING: This will delete all data!")
 
     engine = create_async_engine(settings.database_url, echo=True)
 
     async with engine.begin() as conn:
         # Drop all tables
         await conn.run_sync(Base.metadata.drop_all)
-        print("✓ Dropped all tables")
+        print("[OK] Dropped all tables")
 
         # Create all tables
         await conn.run_sync(Base.metadata.create_all)
-        print("✓ Created all tables")
+        print("[OK] Created all tables")
 
     await engine.dispose()
 

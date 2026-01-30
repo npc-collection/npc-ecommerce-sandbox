@@ -88,7 +88,7 @@ async def start_simulation(config: SimulationConfig, background_tasks: Backgroun
         raise HTTPException(
             status_code=400,
             detail=f"Invalid scenario '{config.scenario}'. Valid options: {valid}",
-        )
+        ) from None
 
     _simulation_state["running"] = True
     _simulation_state["scenario"] = config.scenario

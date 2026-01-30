@@ -1,14 +1,14 @@
 """Simulation engine for generating e-commerce events."""
 
 import asyncio
+import logging
 import random
 from collections.abc import AsyncGenerator
 from datetime import datetime, timedelta
 from decimal import Decimal
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from config import get_settings
 from db.models.ecommerce import (
@@ -22,6 +22,8 @@ from db.models.ecommerce import (
 )
 
 from .scenarios import ScenarioConfig, ScenarioType, get_scenario
+
+logger = logging.getLogger(__name__)
 
 settings = get_settings()
 
@@ -47,9 +49,7 @@ class SimulationEngine:
         self.base_order_rate = order_rate
         self.include_price_changes = include_price_changes
         self.include_inventory_events = include_inventory_events
-
-        if random_seed is not None:
-            random.seed(random_seed)
+        self.rng = random.Random(random_seed)
 
         self.is_running = False
         self.scenario: ScenarioConfig | None = None
@@ -62,7 +62,7 @@ class SimulationEngine:
 
         # Create async session
         engine = create_async_engine(settings.database_url, echo=False)
-        self.async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+        self.async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     def set_scenario(self, scenario_type: ScenarioType | str) -> None:
         """Set the simulation scenario.
@@ -130,7 +130,7 @@ class SimulationEngine:
                     inv_probability = (
                         self.scenario.inventory_pressure if self.scenario else 0.3
                     ) * 0.2
-                    if random.random() < inv_probability:
+                    if self.rng.random() < inv_probability:
                         inv_event = await self._trigger_inventory_event()
                         if inv_event:
                             inv_event["elapsed_minutes"] = elapsed
@@ -141,7 +141,7 @@ class SimulationEngine:
                     price_probability = (
                         self.scenario.price_volatility if self.scenario else 0.1
                     ) * 0.1
-                    if random.random() < price_probability:
+                    if self.rng.random() < price_probability:
                         price_event = await self._trigger_price_change()
                         if price_event:
                             price_event["elapsed_minutes"] = elapsed
@@ -150,7 +150,7 @@ class SimulationEngine:
                 # Wait based on order rate
                 wait_seconds = 60 / self.effective_order_rate
                 # Add some randomness to timing
-                wait_seconds *= random.uniform(0.5, 1.5)
+                wait_seconds *= self.rng.uniform(0.5, 1.5)
                 await asyncio.sleep(wait_seconds)
 
             except Exception as e:
@@ -222,7 +222,7 @@ class SimulationEngine:
             "data": data,
         }
         self.events_log.append(event)
-        print(f"[SIMULATION] {event_type}: {data}")
+        logger.info("%s: %s", event_type, data)
         return event
 
     async def _generate_order(self) -> dict | None:
@@ -235,7 +235,7 @@ class SimulationEngine:
                 if not customers:
                     return None
 
-                customer = random.choice(customers)
+                customer = self.rng.choice(customers)
 
                 # Get products based on scenario
                 query = select(Product).where(Product.is_active)
@@ -248,13 +248,13 @@ class SimulationEngine:
                 if self.scenario and "featured_categories" in self.scenario.special_behaviors:
                     featured = self.scenario.special_behaviors["featured_categories"]
                     featured_products = [p for p in products if p.category in featured]
-                    if featured_products and random.random() < 0.7:
+                    if featured_products and self.rng.random() < 0.7:
                         products = featured_products
 
                 # Select 1-5 products (more during peak scenarios)
                 max_items = 5 if self.scenario and self.scenario.order_rate_multiplier > 2 else 3
-                num_items = random.randint(1, min(max_items, len(products)))
-                selected_products = random.sample(products, num_items)
+                num_items = self.rng.randint(1, min(max_items, len(products)))
+                selected_products = self.rng.sample(products, num_items)
 
                 # Calculate totals
                 subtotal = Decimal("0.00")
@@ -263,9 +263,9 @@ class SimulationEngine:
                 for product in selected_products:
                     # Quantity based on scenario
                     if self.scenario and self.scenario.order_rate_multiplier > 3:
-                        quantity = random.randint(1, 5)  # Larger orders during peaks
+                        quantity = self.rng.randint(1, 5)  # Larger orders during peaks
                     else:
-                        quantity = random.randint(1, 3)
+                        quantity = self.rng.randint(1, 3)
 
                     # Apply scenario discounts
                     price = product.current_price
@@ -347,14 +347,14 @@ class SimulationEngine:
                 if not inventories:
                     return None
 
-                inventory = random.choice(inventories)
+                inventory = self.rng.choice(inventories)
 
                 # Depletion vs replenishment based on scenario
                 depletion_chance = self.scenario.inventory_pressure if self.scenario else 0.5
 
-                if random.random() < depletion_chance:
+                if self.rng.random() < depletion_chance:
                     # Deplete inventory
-                    base_depletion = random.randint(5, 20)
+                    base_depletion = self.rng.randint(5, 20)
                     if self.scenario and "stock_depletion_rate" in self.scenario.special_behaviors:
                         base_depletion = int(
                             base_depletion * self.scenario.special_behaviors["stock_depletion_rate"]
@@ -387,7 +387,7 @@ class SimulationEngine:
                         self.scenario
                         and "restock_delay_multiplier" in self.scenario.special_behaviors
                     ):
-                        if random.random() < 0.7:  # 70% chance of delayed restock
+                        if self.rng.random() < 0.7:  # 70% chance of delayed restock
                             return self.log_event(
                                 "restock_delayed",
                                 {
@@ -418,20 +418,20 @@ class SimulationEngine:
                 if not products:
                     return None
 
-                product = random.choice(products)
+                product = self.rng.choice(products)
                 old_price = product.current_price
 
                 # Calculate price change based on scenario
                 if self.scenario and "competitor_price_range" in self.scenario.special_behaviors:
                     # Price war scenario - respond to competitor prices
                     low, high = self.scenario.special_behaviors["competitor_price_range"]
-                    competitor_change = Decimal(str(random.uniform(low, high)))
+                    competitor_change = Decimal(str(self.rng.uniform(low, high)))
 
                     # Match or beat competitor
                     if self.scenario.special_behaviors.get("price_match_enabled"):
                         adjustment = competitor_change - Decimal("0.01")
                     else:
-                        adjustment = Decimal(str(random.uniform(-0.05, 0.05)))
+                        adjustment = Decimal(str(self.rng.uniform(-0.05, 0.05)))
 
                     # Enforce margin floor
                     margin_floor = self.scenario.special_behaviors.get("margin_floor", 0.05)
@@ -442,7 +442,7 @@ class SimulationEngine:
                 else:
                     # Normal price adjustment
                     volatility = self.scenario.price_volatility if self.scenario else 0.1
-                    adjustment = Decimal(str(random.uniform(-volatility, volatility)))
+                    adjustment = Decimal(str(self.rng.uniform(-volatility, volatility)))
                     min_price = product.cost * Decimal("1.05")
 
                 new_price = product.current_price * (Decimal("1.00") + adjustment)

@@ -1,5 +1,6 @@
 """FastAPI application setup."""
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -9,6 +10,8 @@ from config import get_settings
 
 from .routes import agents_router, ecommerce_router, simulation_router
 
+logger = logging.getLogger(__name__)
+
 settings = get_settings()
 
 
@@ -16,7 +19,7 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     """Application lifespan handler."""
     # Startup
-    print(f"Starting {settings.app_name}...")
+    logger.info("Starting %s...", settings.app_name)
 
     # Initialize database connection pool
     # Initialize Redis connection
@@ -25,7 +28,7 @@ async def lifespan(app: FastAPI):
     yield
 
     # Shutdown
-    print(f"Shutting down {settings.app_name}...")
+    logger.info("Shutting down %s...", settings.app_name)
     # Clean up resources
 
 
