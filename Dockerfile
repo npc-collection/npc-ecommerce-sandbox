@@ -34,7 +34,6 @@ COPY messaging/ ./messaging/
 COPY simulation/ ./simulation/
 COPY dashboard/ ./dashboard/
 COPY main.py ./
-COPY __init__.py ./
 
 # Create non-root user for security
 RUN useradd --create-home --shell /bin/bash appuser && \
