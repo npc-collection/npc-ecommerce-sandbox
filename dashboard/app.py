@@ -1,6 +1,5 @@
 """Streamlit dashboard for NPC E-commerce Sandbox."""
 
-from numpy.random import f
 from datetime import datetime
 
 import httpx
